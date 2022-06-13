@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # Bibliothèques standards
-import logging
 import datetime
 
 import tkinter as tk
@@ -14,10 +13,8 @@ import sqlalchemy as sqla
 
 # Bibliothèques maison
 from polygphys.outils.config import FichierConfig
-from polygphys.outils.base_de_donnees import BaseDeDonnées
+from polygphys.outils.base_de_donnees import BaseDeDonnées, BaseTableau
 from polygphys.outils.base_de_donnees.dtypes import column
-from polygphys.outils.reseau import DisqueRéseau
-from polygphys.outils.journal import Formats, Journal
 
 from polygphys.outils.interface_graphique import InterfaceHandler
 from polygphys.outils.interface_graphique.tableau import Formulaire
@@ -28,7 +25,7 @@ class FeuilleDeTempsConfig(FichierConfig):
     def default(self) -> str:
         return (Path(__file__).parent / 'heures.cfg').open().read()
 
-class FeuilleDeTemps(BaseDeDonnées):
+class FeuilleDeTemps(BaseTableau):
     colonnes_standard = (column('index', int, primary_key=True),
                          column('payeur', str),
                          column('date', datetime.datetime),
@@ -38,24 +35,27 @@ class FeuilleDeTemps(BaseDeDonnées):
                          column('atelier', bool),
                          column('precision_dept', str),
                          column('autres', str))
-    table_standard = 'heures'
 
     def __init__(self, adresse: str, reflect: bool = True):
+        table = 'heures'
+
         metadata = sqla.MetaData()
-        super().__init__(adresse, metadata)
+        db = BaseDeDonnées(adresse, metadata)
 
         if reflect:
-            moteur = self.create_engine()
-            self.metadata.reflect(moteur)
+            moteur = db.create_engine()
+            metadata.reflect(moteur)
         else:
-            sqla.Table(self.table_standard,
-                       self.metadata,
+            sqla.Table(table,
+                       metadata,
                        *self.colonnes_standard)
+
+        super().__init__(db, table)
 
 class FormulaireDeTemps(Formulaire):
 
     def __init__(self, handler: InterfaceHandler, feuille: FeuilleDeTemps):
-        super().__init__(handler, feuille, feuille.table_standard)
+        super().__init__(handler, feuille.db, feuille.table)
 
 
 if __name__ == '__main__':
