@@ -3,6 +3,7 @@
 
 # Bibliothèques standards
 import datetime
+import time
 
 from pathlib import Path
 
@@ -50,34 +51,38 @@ def main():
         conversions = config['conversion']
         à_exporter = à_exporter.rename(columns=conversions)
 
-        colonnes = config.getlist('export', 'xlsx')
-        ajouts = filter(lambda x: x not in à_exporter.columns, colonnes)
-        for colonne in ajouts:
-            if colonne in config['export'].keys():
-                à_exporter.loc[:, colonne] = config.get('export', colonne)
-            else:
-                à_exporter.loc[:, colonne] = None
+        if not à_exporter.empty:
+            colonnes = config.getlist('export', 'xlsx')
+            ajouts = filter(lambda x: x not in à_exporter.columns, colonnes)
+            
+            for colonne in ajouts:
+                if colonne in config['export'].keys():
+                    à_exporter.loc[:, colonne] = config.get('export', colonne)
+                else:
+                    à_exporter.loc[:, colonne] = None
 
-        à_exporter = à_exporter.loc[:, colonnes]
+            à_exporter = à_exporter.loc[:, colonnes]
 
-        vieilles_entrées = pd.read_excel(fichier_excel)
-        toutes_entrées = pd.concat((vieilles_entrées, à_exporter),
-                                   ignore_index=True)\
-                           .sort_values(by=['Date', 'Payeur', 'Demandeur'])\
-                           .reset_index(drop=True)
-        
-        toutes_entrées.to_excel(fichier_excel,
-                                sheet_name=f'feuille de temps {datetime.date.today()}',
-                                index=False)
+            vieilles_entrées = pd.read_excel(fichier_excel)
+            toutes_entrées = pd.concat((vieilles_entrées, à_exporter),
+                                       ignore_index=True)\
+                               .sort_values(by=['Date', 'Payeur', 'Demandeur'])\
+                               .reset_index(drop=True)
+            
+            toutes_entrées.to_excel(fichier_excel,
+                                    sheet_name=f'feuille de temps {datetime.date.today()}',
+                                    index=False)
 
-        nouvelles_entrées.loc[:, 'exporte'] = True
-        git.add(str(fichier_excel))
-        
-        feuille_de_temps.update(nouvelles_entrées)
-        git.commit(f'Màj automatisée le {datetime.datetime.now()}')
+            nouvelles_entrées.loc[:, 'exporte'] = True
+            git.add(str(fichier_excel))
+            
+            feuille_de_temps.update(nouvelles_entrées)
+            git.commit(f'Màj automatisée le {datetime.datetime.now()}')
 
 
 schedule.every().day.at('17:00').do(main)
+
+main()
 try:
     while True:
         schedule.run_pending()
