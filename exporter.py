@@ -3,15 +3,14 @@
 
 # Bibliothèques standards
 import datetime
-import time
 
 from pathlib import Path
 
 # Bibliothèques PIPy
 import pandas as pd
-import schedule
 import getpass
 import keyring
+import schedule
 
 # Bibliothèques maison
 from polygphys.outils.reseau import DisqueRéseau
@@ -78,13 +77,10 @@ def main():
         git.commit(f'Màj automatisée le {datetime.datetime.now()}')
 
 
-if __name__ == '__main__':
-    schedule.every().day.at('17:00').do(main)
-    try:
-        while True:
-            schedule.run_pending()
-            time.sleep(1)
-    except KeyboardInterrupt:
-        print('On arrête.')
-
-    print('Terminé.')
+schedule.every().day.at('17:00').do(main)
+try:
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+except KeyboardInterrupt:
+    print('Fin.')
