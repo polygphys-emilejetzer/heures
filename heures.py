@@ -58,16 +58,27 @@ class FormulaireDeTemps(Formulaire):
         super().__init__(handler, feuille.db, feuille.nom_table)
 
 
-if __name__ == '__main__':
+def main():
+    import logging
+    
     chemin = Path('~/Documents/Polytechnique/Heures').expanduser()
+    logging.info(f'{chemin=}')
     config = FeuilleDeTempsConfig(chemin / 'heures.cfg')
+    logging.info(f'{config=}')
 
     adresse = config.get('bd', 'adresse')
+    logging.info(f'{adresse=}')
 
     feuille_de_temps = FeuilleDeTemps(adresse)
+    logging.info('Feuille de temps configurée.')
 
     racine = tk.Tk()
     handler = tkHandler(racine)
     formulaire = FormulaireDeTemps(handler, feuille_de_temps)
     formulaire.grid(0, 0)
+    logging.info('Interface configurée.')
+
     racine.mainloop()
+
+if __name__ == '__main__':
+    main()

@@ -79,13 +79,13 @@ def main():
             feuille_de_temps.update(nouvelles_entrées)
             git.commit(f'Màj automatisée le {datetime.datetime.now()}')
 
+if __name__ == '__main__':
+        schedule.every().day.at('17:00').do(main)
 
-schedule.every().day.at('17:00').do(main)
-
-main()
-try:
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-except KeyboardInterrupt:
-    print('Fin.')
+        main()
+        try:
+            while True:
+                schedule.run_pending()
+                time.sleep(1)
+        except KeyboardInterrupt:
+            print('Fin.')
