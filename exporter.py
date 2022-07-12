@@ -18,7 +18,7 @@ from polygphys.outils.reseau import DisqueRéseau
 from polygphys.outils.journal import Repository
 from polygphys.outils.base_de_donnees import BaseTableau
 
-from heures import FeuilleDeTempsConfig, FeuilleDeTemps
+from polygphys.admin.heures.heures import FeuilleDeTempsConfig, FeuilleDeTemps
 
 
 def main():
