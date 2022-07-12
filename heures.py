@@ -37,7 +37,7 @@ class FeuilleDeTemps(BaseTableau):
                          column('autres', str))
 
     def __init__(self, adresse: str, reflect: bool = True):
-        table = 'heures'
+        nom_table = 'heures'
 
         metadata = sqla.MetaData()
         db = BaseDeDonnées(adresse, metadata)
@@ -46,16 +46,16 @@ class FeuilleDeTemps(BaseTableau):
             moteur = db.create_engine()
             metadata.reflect(moteur)
         else:
-            sqla.Table(table,
+            sqla.Table(nom_table,
                        metadata,
                        *self.colonnes_standard)
 
-        super().__init__(db, table)
+        super().__init__(db, nom_table)
 
 class FormulaireDeTemps(Formulaire):
 
     def __init__(self, handler: InterfaceHandler, feuille: FeuilleDeTemps):
-        super().__init__(handler, feuille.db, feuille.table)
+        super().__init__(handler, feuille.db, feuille.nom_table)
 
 
 if __name__ == '__main__':
