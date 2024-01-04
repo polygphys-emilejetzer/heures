@@ -1,4 +1,4 @@
 #!/bin/zsh
-source ~/env/polygphys_main/bin/activate
+source ~/env/polygphys/bin/activate
 cd ~/Documents/Polytechnique/Répertoires\ de\ code/heures/
 python heures.py
